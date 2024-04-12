@@ -12,12 +12,15 @@
 void setup() {
   setup_serial(9600);
   setup_wave();
+  setup_play();
+  startup_complete();
 }
 
 // put your main code here, to run repeatedly:
 void loop() {
   DEBUG_INFO("start detecting...\n");
   runWave();
+  start_play();
 
   delay(200);
 }

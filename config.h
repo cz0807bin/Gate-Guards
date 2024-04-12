@@ -26,3 +26,12 @@ void turnoff_led_for_test();
 ////////////////////////////
 void setup_wave();
 void runWave();
+
+////////////////////////////
+//        Play Fun        //
+////////////////////////////
+extern int isPlay;
+void setup_play();
+void startup_complete();
+void start_play();
+//void pause_play();

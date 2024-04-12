@@ -13,6 +13,7 @@ const int Trig_1=2;
 const int Echo_1=3;
 
 #define MAX_DISTANCE 100 // Maximum distance we want to ping for (in centimeters). Maximum sensor distance is rated at 400-500cm.
+#define FIRST_WAVE_STANDARD_DISTANCE (10.00) // cm
 
 NewPing sonar(Trig_1, Echo_1, MAX_DISTANCE); // NewPing setup of pins and maximum distance.
 
@@ -41,6 +42,9 @@ static void echoCheck() { // Timer2 interrupt calls this function every 24uS whe
     int distance=sonar.ping_result / US_ROUNDTRIP_CM;
     Serial.print(distance); // Ping returned, uS result in ping_result, convert to cm with US_ROUNDTRIP_CM.
     DEBUG_INFO("cm\n");
+    if(distance < FIRST_WAVE_STANDARD_DISTANCE){
+      isPlay=1;
+    }
   }
   // Don't do anything here!
 }
