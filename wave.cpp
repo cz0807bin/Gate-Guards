@@ -9,16 +9,19 @@
 #include "config.h"
 #include <NewPing.h>
 
-const int Trig_1=2;
-const int Echo_1=3;
+const int Trig=2;
+const int Echo=3;
 
 #define MAX_DISTANCE 100 // Maximum distance we want to ping for (in centimeters). Maximum sensor distance is rated at 400-500cm.
-#define FIRST_WAVE_STANDARD_DISTANCE (70.00) // cm
+#define WAVE_WARNING_DISTANCE (15.00) // cm
 
-NewPing sonar(Trig_1, Echo_1, MAX_DISTANCE); // NewPing setup of pins and maximum distance.
+NewPing sonar(Trig, Echo, MAX_DISTANCE); // NewPing setup of pins and maximum distance.
 
 unsigned int pingSpeed = 50; // How frequently are we going to send out a ping (in milliseconds). 50ms would be 20 times a second.
 unsigned long pingTimer;     // Holds the next ping time.
+
+int lastDistance, curDistance, offsetDistance;
+int isRecordfirst = 1;
 
 static void echoCheck();
 
@@ -39,11 +42,19 @@ static void echoCheck() { // Timer2 interrupt calls this function every 24uS whe
   // Don't do anything here!
   if (sonar.check_timer()) { // This is how you check to see if the ping was received.
     // Here's where you can add code.
-    int distance=sonar.ping_result / US_ROUNDTRIP_CM;
-    Serial.print(distance); // Ping returned, uS result in ping_result, convert to cm with US_ROUNDTRIP_CM.
+    curDistance=sonar.ping_result / US_ROUNDTRIP_CM;
+    Serial.print(curDistance); // Ping returned, uS result in ping_result, convert to cm with US_ROUNDTRIP_CM.
     DEBUG_INFO("cm\n");
-    if(distance < FIRST_WAVE_STANDARD_DISTANCE){
-      isPlay=1;
+
+    if(isRecordfirst){
+      isRecordfirst=0;
+      lastDistance=curDistance;
+    } else {
+      offsetDistance=lastDistance - curDistance;
+      if(offsetDistance > WAVE_WARNING_DISTANCE){
+        isPlay=1;
+      }
+      lastDistance=curDistance;
     }
   }
   // Don't do anything here!
