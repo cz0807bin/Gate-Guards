@@ -24,12 +24,14 @@ void turnoff_led_for_test();
 ////////////////////////////
 //        Wave Fun        //
 ////////////////////////////
-extern const float FIRST_WAVE_STANDARD_DISTANCE;
-//extern const float SECOND_WAVE_STANDARD_DISTANCE;
-//extern const float THIRD_WAVE_STANDARD_DISTANCE;
 void setup_wave();
-void startup_wave();
-float get_first_wave_distance();
-//float get_second_wave_distance();
-//float get_third_wave_distance();
+void runWave();
 
+////////////////////////////
+//        Play Fun        //
+////////////////////////////
+extern int isPlay;
+void setup_play();
+void startup_complete();
+void start_play();
+//void pause_play();

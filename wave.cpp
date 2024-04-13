@@ -7,91 +7,55 @@
 
 #include "Arduino.h"
 #include "config.h"
+#include <NewPing.h>
 
-const float FIRST_WAVE_STANDARD_DISTANCE=50.00; // cm
-const float SECOND_WAVE_STANDARD_DISTANCE=50.00; // cm
-const float THIRD_WAVE_STANDARD_DISTANCE=50.00; // cm
+const int Trig=2;
+const int Echo=3;
 
-const int Trig_1=2; // The first wave
-const int Echo_1=3;
-//const int Trig_2=4; // The second wave
-//const int Echo_2=5;
-//const int Trig_3=6; // The third wave
-//const int Echo_3=7;
+#define MAX_DISTANCE 100 // Maximum distance we want to ping for (in centimeters). Maximum sensor distance is rated at 400-500cm.
+#define WAVE_WARNING_DISTANCE (15.00) // cm
 
-static void setup_one_wave(const int Trig, const int Echo)
-{
-  if(Trig <= 0 || Echo <= 0){
-    DEBUG_INFO("Trig or Echo pin num error.\n");
-    exit(1);
+NewPing sonar(Trig, Echo, MAX_DISTANCE); // NewPing setup of pins and maximum distance.
+
+unsigned int pingSpeed = 50; // How frequently are we going to send out a ping (in milliseconds). 50ms would be 20 times a second.
+unsigned long pingTimer;     // Holds the next ping time.
+
+int lastDistance, curDistance, offsetDistance;
+int isRecordfirst = 1;
+
+static void echoCheck();
+
+void setup_wave() {
+  pingTimer = millis(); // Start now.
+}
+ 
+void runWave() {
+  // Notice how there's no delays in this sketch to allow you to do other processing in-line while doing distance pings.
+  if (millis() >= pingTimer) {   // pingSpeed milliseconds since last ping, do another ping.
+    pingTimer += pingSpeed;      // Set the next ping time.
+    sonar.ping_timer(echoCheck); // Send out the ping, calls "echoCheck" function every 24uS where you can check the ping status.
   }
-  
-  pinMode(Trig, OUTPUT);
-  pinMode(Echo, INPUT);
+  // Do other stuff here, really. Think of it as multi-tasking.
 }
 
-void setup_wave()
-{
-  setup_one_wave(Trig_1, Echo_1);
-  //setup_one_wave(Trig_2, Echo_2);
-  //setup_one_wave(Trig_3, Echo_3);
+static void echoCheck() { // Timer2 interrupt calls this function every 24uS where you can check the ping status.
+  // Don't do anything here!
+  if (sonar.check_timer()) { // This is how you check to see if the ping was received.
+    // Here's where you can add code.
+    curDistance=sonar.ping_result / US_ROUNDTRIP_CM;
+    Serial.print(curDistance); // Ping returned, uS result in ping_result, convert to cm with US_ROUNDTRIP_CM.
+    DEBUG_INFO("cm\n");
 
-  DEBUG_INFO("===> setup wave success...\n");
-}
-
-void startup_wave()
-{
-  digitalWrite(Trig_1, LOW);
-  //digitalWrite(Trig_2, LOW);
-  //digitalWrite(Trig_3, LOW);
-  delayMicroseconds(2);
-  
-  digitalWrite(Trig_1, HIGH);
-  //digitalWrite(Trig_2, HIGH);
-  //digitalWrite(Trig_3, HIGH);
-  delayMicroseconds(15); // pin trig just need 10us for high level, but used 15us for stable.
-  
-  digitalWrite(Trig_1, LOW);
-  //digitalWrite(Trig_2, LOW);
-  //digitalWrite(Trig_3, LOW);
-  
-  DEBUG_INFO("===> startup wave success...\n");
-}
-
-static float get_wave_distance(const int Echo, const int Level, const long Timeout)
-{
-  if(Echo <=0 || Timeout <=0){
-    DEBUG_INFO("Echo or Timeout error.\n");
-    exit(1);
+    if(isRecordfirst){
+      isRecordfirst=0;
+      lastDistance=curDistance;
+    } else {
+      offsetDistance=lastDistance - curDistance;
+      if(offsetDistance > WAVE_WARNING_DISTANCE){
+        isPlay=1;
+      }
+      lastDistance=curDistance;
+    }
   }
-  
-  if(Level != HIGH && Level != LOW){
-    DEBUG_INFO("Level error.\n");
-    exit(1);
-  }
-  
-  long pulseTime=0;
-  float distance=0;
-  
-  pulseTime=pulseIn(Echo, Level, Timeout);
-  distance=pulseTime/58.00; // distance = (pulseTime / 2) * (340 * 100 / 1000000)
-  DEBUG_INFO("distcance is : \r");
-  Serial.println(distance);  DEBUG_INFO("cm");
-
-  return distance;
-}
-
-float get_first_wave_distance()
-{
-  return get_wave_distance(Echo_1, HIGH, 1000000);
-}
-
-float get_second_wave_distance()
-{
-  //return get_wave_distance(Echo_2, HIGH, 1000000);
-}
-
-float get_third_wave_distance()
-{
-  //return get_wave_distance(Echo_3, HIGH, 1000000);
+  // Don't do anything here!
 }
