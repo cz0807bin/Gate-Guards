@@ -10,18 +10,15 @@
 
 const int Led=13;
 
-void setup_led_for_test()
-{
+void setup_led_for_test() {
   pinMode(Led, OUTPUT);
-  Serial.println("===> setup led success...\n");
+  DEBUG_INFO("===> setup led success...\n");
 }
 
-void turnon_led_for_test()
-{
+void turnon_led_for_test() {
   digitalWrite(Led, HIGH);
 }
 
-void turnoff_led_for_test()
-{
+void turnoff_led_for_test() {
   digitalWrite(Led, LOW);
 }
