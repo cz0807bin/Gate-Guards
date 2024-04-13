@@ -13,7 +13,7 @@ const int Trig_1=2;
 const int Echo_1=3;
 
 #define MAX_DISTANCE 100 // Maximum distance we want to ping for (in centimeters). Maximum sensor distance is rated at 400-500cm.
-#define FIRST_WAVE_STANDARD_DISTANCE (10.00) // cm
+#define FIRST_WAVE_STANDARD_DISTANCE (70.00) // cm
 
 NewPing sonar(Trig_1, Echo_1, MAX_DISTANCE); // NewPing setup of pins and maximum distance.
 

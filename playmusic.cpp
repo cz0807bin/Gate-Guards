@@ -33,7 +33,9 @@ void setup_play() {
 void startup_complete() {
   if(isStartComplete){
     isStartComplete=0;
-    delay(2000); // set delay in order to start music finish play, at least 1.5ms.
+                 // Set delay in order to start music finish play, 
+    delay(5000); // when using a computer USB power supply, at least 1.5ms,
+                 // when using an external power supply, at least 4ms.
     digitalWrite(Play_1, LOW);
     delay(60);
     digitalWrite(Play_1, HIGH);

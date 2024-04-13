@@ -22,5 +22,5 @@ void loop() {
   runWave();
   start_play();
 
-  delay(200);
+  delay(100);
 }
